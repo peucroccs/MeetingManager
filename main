@@ -1,0 +1,43 @@
+import openpyxl as xl
+
+def all_indexes(list_of_elems, element):
+    index_pos_list = []
+    index_pos = 0
+    while True:
+        try:
+            index_pos = list_of_elems.index(element, index_pos)
+            index_pos_list.append(index_pos)
+            index_pos += 1
+        except ValueError as e:
+            break
+    return index_pos_list
+    
+path = "C:/Users/pedro/Downloads/Pasta de trabalho 1.xlsx"
+wb_obj = xl.load_workbook(path)
+sheet_obj = wb_obj.active
+columns = sheet_obj.max_column
+rows = sheet_obj.max_row
+
+
+namelist = []
+for i in range(2, rows+1):
+    name = sheet_obj.cell(row= i, column = 1)
+    namelist.append(name.value)
+
+members = int(input('Number of Members: '))
+
+mainlist = []
+c0 = 0
+while c0 < members:
+    member = input('Name of the member: ')
+    number = namelist.index(member) + 2
+    schedules = []
+    for i in range(2, columns+1):
+        cell_obj = sheet_obj.cell(row= number, column= i)
+        schedules.append(cell_obj.value)
+    mainlist.append(schedules)
+    c0 += 1
+
+indexhour = []
+for schedule in mainlist:
+    indexhour.append(all_indexes(schedule, 1))
