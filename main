@@ -1,5 +1,22 @@
 import openpyxl as xl
 
+
+#Creating a function to find the common element on all lists in a matrix
+def find_common(matrix):
+    new_list = []
+    for i in matrix:
+        for j in i:
+            new_list.append(j)
+    sorted_list = sorted(new_list)
+    intersection = []
+    for element in sorted_list:
+        if sorted_list.count(element) == len(matrix):
+            if element not in intersection:
+                intersection.append(element)
+    return intersection
+
+#function to get all indexes of an element inside a list
+
 def all_indexes(list_of_elems, element):
     index_pos_list = []
     index_pos = 0
@@ -11,33 +28,50 @@ def all_indexes(list_of_elems, element):
         except ValueError as e:
             break
     return index_pos_list
-    
-path = "C:/Users/pedro/Downloads/Pasta de trabalho 1.xlsx"
+
+path = "C:/Users/pedro/Downloads/Pasta de trabalho 2.xlsx"
 wb_obj = xl.load_workbook(path)
 sheet_obj = wb_obj.active
 columns = sheet_obj.max_column
 rows = sheet_obj.max_row
 
-
+#Creating a list with all names and hours in the sheet (usually the first column)
 namelist = []
 for i in range(2, rows+1):
-    name = sheet_obj.cell(row= i, column = 1)
+    name = sheet_obj.cell(row=i, column=1)
     namelist.append(name.value)
+hours = []
+for time in range(2, columns+1):
+    time_cell = sheet_obj.cell(row=1, column=time)
+    hours.append(time_cell.value)
 
-members = int(input('Number of Members: '))
-
-mainlist = []
+#The number of the members that will meet
+members = int(input('Number of members: '))
+main_list = []
+project_members = []
 c0 = 0
 while c0 < members:
-    member = input('Name of the member: ')
-    number = namelist.index(member) + 2
+    member = input('Name of the member: ')  #The name of the member that will meet
+    member_number = namelist.index(member) + 2    #Getting the index of the member + 2 (1 because of the list and 1 because the first row are schedules)
+    project_members.append(member)
     schedules = []
     for i in range(2, columns+1):
-        cell_obj = sheet_obj.cell(row= number, column= i)
+        cell_obj = sheet_obj.cell(row=member_number, column=i)
         schedules.append(cell_obj.value)
-    mainlist.append(schedules)
+    main_list.append(schedules)        #Gets a matrix with (members) size, this matrix gets 1s and 0s from all members listed
     c0 += 1
 
-indexhour = []
-for schedule in mainlist:
-    indexhour.append(all_indexes(schedule, 1))
+index_hour = []
+for schedule in main_list:
+    index_hour.append(all_indexes(schedule, 1))      #get the index of all 1s on all lists in mainlist
+
+perfect_index = find_common(index_hour)  #find all common index
+
+#return indexes to hours in a new list
+perfect_hour = []
+for time in perfect_index:
+    perfect_hour.append(hours[time])
+
+print(', '.join([str(p) for p in project_members]))
+print('Podem se reunir às:')
+print(', '.join([str(h) for h in perfect_hour]))
